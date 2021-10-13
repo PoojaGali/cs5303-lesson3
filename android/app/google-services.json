@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "302739177503",
+    "project_id": "cs5303-poojag-lesson3",
+    "storage_bucket": "cs5303-poojag-lesson3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302739177503:android:a6db70f16cff5bb2f5552a",
+        "android_client_info": {
+          "package_name": "edu.uco.pgali.cmsc5303.lesson3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302739177503-ohdin0iq9vo1g60vrev46777pfbb2fa7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOkA5thUF3ATfSW0bzcS73FfLu86FTWyg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "302739177503-ohdin0iq9vo1g60vrev46777pfbb2fa7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
