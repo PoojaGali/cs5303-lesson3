@@ -12,7 +12,7 @@ class MyDialog {
       duration: Duration(seconds: seconds),
       content: Text(message),
       action: SnackBarAction(
-        label: label,
+        label: 'Dismiss',
         onPressed: () {},
       ),
     );
