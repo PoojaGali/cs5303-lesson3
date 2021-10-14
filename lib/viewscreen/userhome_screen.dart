@@ -5,6 +5,7 @@ import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
+import 'package:lesson3/viewscreen/view/webimage.dart';
 
 class UserHomeScreen extends StatefulWidget {
   static const routeName = '/UserHomeScreen';
@@ -40,31 +41,62 @@ class _UserHomeState extends State<UserHomeScreen> {
     return WillPopScope(
       onWillPop: () => Future.value(false), //disable android system back
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('User Home'),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(widget.displayName),
-                accountEmail: Text(widget.email),
-              ),
-              ListTile(
-                leading: Icon(Icons.exit_to_app),
-                title: Text('Sign Out'),
-                onTap: con.signOut,
-              )
-            ],
+          appBar: AppBar(
+            title: Text('User Home'),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: con.addButton,
-        ),
-        body: Text(
-            'User Home:${widget.user.email}\nphotoMemo: ${widget.photoMemoList.length}'),
-      ),
+          drawer: Drawer(
+            child: ListView(
+              children: [
+                UserAccountsDrawerHeader(
+                  accountName: Text(widget.displayName),
+                  accountEmail: Text(widget.email),
+                ),
+                ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title: Text('Sign Out'),
+                  onTap: con.signOut,
+                ),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: con.addButton,
+          ),
+          body: widget.photoMemoList.length == 0
+              ? Text(
+                  'No PhotoMemo found!',
+                  style: Theme.of(context).textTheme.headline6,
+                )
+              : ListView.builder(
+                  itemCount: widget.photoMemoList.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: WebImage(
+                        url: widget.photoMemoList[index].photoURL,
+                        context: context,
+                      ),
+                      title: Text(widget.photoMemoList[index].title),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.photoMemoList[index].memo.length >= 40
+                                ? widget.photoMemoList[index].memo
+                                        .substring(0, 40) +
+                                    '....'
+                                : widget.photoMemoList[index].memo,
+                          ),
+                          Text(
+                              'Created By : ${widget.photoMemoList[index].createdBy}'),
+                          Text(
+                              'SharedWith : ${widget.photoMemoList[index].sharedWith}'),
+                          Text(
+                              'Timestamp : ${widget.photoMemoList[index].timestamp}'),
+                        ],
+                      ),
+                    );
+                  })),
     );
   }
 }
@@ -73,13 +105,15 @@ class _Controller {
   late _UserHomeState state;
   _Controller(this.state);
 
-  void addButton() {
+  void addButton() async {
     //navigate to AddNewPhotoMemo
 
-    Navigator.pushNamed(state.context, AddNewPhotoMemoScreen.routeName,
+    await Navigator.pushNamed(state.context, AddNewPhotoMemoScreen.routeName,
         arguments: {
           ARGS.USER: state.widget.user,
+          ARGS.PhotoMemoList: state.widget.photoMemoList,
         });
+    state.render(() {}); // render the home screen if new photomemo is added
   }
 
   Future<void> signOut() async {

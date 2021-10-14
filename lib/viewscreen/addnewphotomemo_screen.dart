@@ -13,8 +13,9 @@ import 'package:lesson3/viewscreen/view/mydialog.dart';
 class AddNewPhotoMemoScreen extends StatefulWidget {
   static const routeName = '/AddNewPhotoMemoScreen';
   late final User user;
+  final List<PhotoMemo> photoMemoList;
 
-  AddNewPhotoMemoScreen({required this.user});
+  AddNewPhotoMemoScreen({required this.user, required this.photoMemoList});
   @override
   State<StatefulWidget> createState() {
     return _AddNewPhotoMemoState();
@@ -138,6 +139,7 @@ class _Controller {
       );
       return;
     }
+    MyDialog.circularProgressStart(state.context);
     try {
       Map photoInfo = await CloudStorageController.uploadPhotoFile(
           photo: state.photo!,
@@ -158,9 +160,12 @@ class _Controller {
       String docId =
           await FirestoreController.addPhotoMemo(photoMemo: tempMemo);
       tempMemo.docId = docId;
+      state.widget.photoMemoList.insert(0, tempMemo);
+      MyDialog.circularProgressStop(state.context);
       // return to user home screen
       Navigator.pop(state.context);
     } catch (e) {
+      MyDialog.circularProgressStop(state.context);
       if (Constant.DEV) print('==== Add new photomemo failed : $e');
       MyDialog.showSnackBar(
         context: state.context,

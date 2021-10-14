@@ -58,15 +58,17 @@ class PhotoMemo {
     }
     return PhotoMemo(
       docId: docId,
-      createdBy: doc[CREATED_BY],
-      title: doc[TITLE],
-      memo: doc[MEMO],
-      photoFilename: doc[PHOTO_FILENAME],
-      photoURL: doc[PHOTO_URL],
-      sharedWith: doc[SHARED_WITH],
-      imageLabels: doc[IMAGE_LABELS],
-      timestamp: DateTime.fromMillisecondsSinceEpoch(
-          doc[TIMESTAMP].millisecondsSinceEpoch),
+      createdBy: doc[CREATED_BY] ??= 'N/A',
+      title: doc[TITLE] ??= 'N/A',
+      memo: doc[MEMO] ??= 'N/A',
+      photoFilename: doc[PHOTO_FILENAME] ??= 'N/A',
+      photoURL: doc[PHOTO_URL] ??= 'N/A',
+      sharedWith: doc[SHARED_WITH] ??= [],
+      imageLabels: doc[IMAGE_LABELS] ??= [],
+      timestamp: doc[TIMESTAMP] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              doc[TIMESTAMP].millisecondsSinceEpoch)
+          : DateTime.now(),
     );
   }
 
