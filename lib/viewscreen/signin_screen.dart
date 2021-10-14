@@ -59,7 +59,7 @@ class _SignInState extends State<SignInScreen> {
               ),
               ElevatedButton(
                 onPressed: con.signIn,
-                child: Text('Submit'),
+                child: Text('Sign In'),
               ),
             ],
           ),
