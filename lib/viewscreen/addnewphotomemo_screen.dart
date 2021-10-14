@@ -156,8 +156,10 @@ class _Controller {
       tempMemo.timestamp = DateTime.now();
 
       String docId =
-          await FireStoreController.addPhotoMemo(photoMemo: tempMemo);
+          await FirestoreController.addPhotoMemo(photoMemo: tempMemo);
       tempMemo.docId = docId;
+      // return to user home screen
+      Navigator.pop(state.context);
     } catch (e) {
       if (Constant.DEV) print('==== Add new photomemo failed : $e');
       MyDialog.showSnackBar(
@@ -194,6 +196,7 @@ class _Controller {
 
   void saveSharedWith(String? value) {
     if (value != null && value.trim().length != 0) {
+      tempMemo.sharedWith.clear();
       tempMemo.sharedWith.addAll(value.trim().split(RegExp('(,| )+')));
     }
   }

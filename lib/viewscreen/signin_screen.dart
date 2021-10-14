@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
+import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/userhome_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 
@@ -85,12 +87,14 @@ class _Controller {
       }
       user = await FirebaseAuthController.signIn(
           email: email!, password: password!);
-      print('=====${user?.email}');
+      List<PhotoMemo> photoMemoList =
+          await FirestoreController.getPhotoMemoList(email: email!);
       Navigator.pushNamed(
         state.context,
         UserHomeScreen.routeName,
         arguments: {
           ARGS.USER: user,
+          ARGS.PhotoMemoList: photoMemoList,
         },
       );
     } catch (e) {

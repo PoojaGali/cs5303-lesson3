@@ -29,9 +29,8 @@ class Lesson3App extends StatelessWidget {
           } else {
             var argument = args as Map;
             var user = argument[ARGS.USER];
-            return UserHomeScreen(
-              user: user,
-            );
+            var photoMemoList = argument[ARGS.PhotoMemoList];
+            return UserHomeScreen(user: user, photoMemoList: photoMemoList);
           }
         },
         AddNewPhotoMemoScreen.routeName: (context) {

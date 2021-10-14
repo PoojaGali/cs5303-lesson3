@@ -8,4 +8,5 @@ enum ARGS {
   USER,
   DownloadURL,
   Filename,
+  PhotoMemoList,
 }
