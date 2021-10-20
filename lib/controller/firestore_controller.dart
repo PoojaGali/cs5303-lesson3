@@ -9,7 +9,6 @@ class FirestoreController {
     DocumentReference ref = await FirebaseFirestore.instance
         .collection(Constant.PHOTOMEMO_COLLECTION)
         .add(photoMemo.toFirestoreDoc());
-
     return ref.id; //doc id
   }
 
@@ -18,6 +17,7 @@ class FirestoreController {
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection(Constant.PHOTOMEMO_COLLECTION)
+        //.collection(Constant.PHOTOMEMO_COLLECTION)
         .where(PhotoMemo.CREATED_BY, isEqualTo: email)
         .orderBy(PhotoMemo.TIMESTAMP, descending: true)
         .get();
@@ -28,7 +28,6 @@ class FirestoreController {
         var document = doc.data() as Map<String, dynamic>;
         var p = PhotoMemo.fromFirestoreDoc(doc: document, docId: doc.id);
         if (p != null) {
-          //filter invalid photomemo doc in Firestore
           result.add(p);
         }
       }
@@ -46,9 +45,9 @@ class FirestoreController {
         .update(updateInfo);
   }
 
-  static searchImages({
+  static Future<List<PhotoMemo>> searchImages({
     required String createdBy,
-    required List<String> searchLabels,
+    required List<String> searchLabels, //OR search
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection(Constant.PHOTOMEMO_COLLECTION)
@@ -64,5 +63,14 @@ class FirestoreController {
       if (p != null) results.add(p);
     });
     return results;
+  }
+
+  static Future<void> deletePhotoMemo({
+    required PhotoMemo photoMemo,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection(Constant.PHOTOMEMO_COLLECTION)
+        .doc(photoMemo.docId)
+        .delete();
   }
 }

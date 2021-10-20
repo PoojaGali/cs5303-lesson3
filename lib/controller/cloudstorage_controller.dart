@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/photomemo.dart';
 import 'package:uuid/uuid.dart';
 
 class CloudStorageController {
@@ -24,5 +25,14 @@ class CloudStorageController {
       ARGS.DownloadURL: downloadURL,
       ARGS.Filename: filename,
     };
+  }
+
+  static Future<void> deletePhotoFile({
+    required PhotoMemo photoMemo,
+  }) async {
+    await FirebaseStorage.instance
+        .ref()
+        .child(photoMemo.photoFilename)
+        .delete();
   }
 }
