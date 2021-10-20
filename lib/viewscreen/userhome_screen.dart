@@ -8,6 +8,7 @@ import 'package:lesson3/model/photomemo.dart';
 
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
+import 'package:lesson3/viewscreen/sharedwith_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 import 'package:lesson3/viewscreen/view/webimage.dart';
 
@@ -90,6 +91,11 @@ class _UserHomeState extends State<UserHomeScreen> {
                   accountEmail: Text(widget.email),
                 ),
                 ListTile(
+                  leading: Icon(Icons.people),
+                  title: Text('Shared With'),
+                  onTap: con.sharedWith,
+                ),
+                ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text('Sign Out'),
                   onTap: con.signOut,
@@ -118,6 +124,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                           url: con.photoMemoList[index].photoURL,
                           context: context,
                         ),
+                        trailing: Icon(Icons.arrow_right),
                         title: Text(con.photoMemoList[index].title),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,6 +168,24 @@ class _Controller {
     photoMemoList = state.widget.photoMemoList;
   }
 
+  void sharedWith() async {
+    try {
+      List<PhotoMemo> photoMemoList =
+          await FirestoreController.getPhotoMemoList(email: state.widget.email);
+      Navigator.pushNamed(state.context, SharedWithScreen.routeName,
+          arguments: {
+            ARGS.PhotoMemoList: photoMemoList,
+            ARGS.USER: state.widget.user,
+          });
+    } catch (e) {
+      if (Constant.DEV) print('===== sharedWith error: $e');
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Failed to get sharedwith list: $e',
+      );
+    }
+  }
+
   void cancelDelete() {
     state.render(() {
       delIndexes.clear();
@@ -168,13 +193,16 @@ class _Controller {
   }
 
   void delete() async {
+    MyDialog.circularProgressStart(state.context);
     delIndexes.sort(); //ascending order
     for (int i = delIndexes.length - 1; i >= 0; i--) {
       try {
         PhotoMemo p = photoMemoList[delIndexes[i]];
         await FirestoreController.deletePhotoMemo(photoMemo: p);
         await CloudStorageController.deletePhotoFile(photoMemo: p);
-        photoMemoList.removeAt(delIndexes[i]);
+        state.render(() {
+          photoMemoList.removeAt(delIndexes[i]);
+        });
       } catch (e) {
         if (Constant.DEV) print('===== failed to delete photomemo: $e');
         MyDialog.showSnackBar(
@@ -184,6 +212,7 @@ class _Controller {
         break; //quit further processing
       }
     }
+    MyDialog.circularProgressStop(state.context);
     state.render(() => delIndexes.clear());
   }
 

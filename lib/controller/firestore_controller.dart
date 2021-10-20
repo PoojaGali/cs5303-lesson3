@@ -73,4 +73,22 @@ class FirestoreController {
         .doc(photoMemo.docId)
         .delete();
   }
+
+  static Future<List<PhotoMemo>> getPhotoMemoListSharedWith({
+    required String email,
+  }) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.PHOTOMEMO_COLLECTION)
+        .where(PhotoMemo.SHARED_WITH, arrayContains: email)
+        .orderBy(PhotoMemo.TIMESTAMP, descending: true)
+        .get();
+
+    var results = <PhotoMemo>[];
+    querySnapshot.docs.forEach((doc) {
+      var p = PhotoMemo.fromFirestoreDoc(
+          doc: doc.data() as Map<String, dynamic>, docId: doc.id);
+      if (p != null) results.add(p);
+    });
+    return results;
+  }
 }

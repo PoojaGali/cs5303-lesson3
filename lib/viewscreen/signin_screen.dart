@@ -5,6 +5,7 @@ import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
+import 'package:lesson3/viewscreen/signup_screen.dart';
 import 'package:lesson3/viewscreen/userhome_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 
@@ -67,6 +68,16 @@ class _SignInState extends State<SignInScreen> {
                   onPressed: con.signIn,
                   child: Text('Sign In'),
                 ),
+                SizedBox(
+                  height: 20.0,
+                ),
+                ElevatedButton(
+                  onPressed: con.signUp,
+                  child: Text(
+                    'Create a new account',
+                    style: Theme.of(context).textTheme.button,
+                  ),
+                )
               ],
             ),
           ),
@@ -82,6 +93,10 @@ class _Controller {
 
   String? email;
   String? password;
+
+  void signUp() {
+    Navigator.pushNamed(state.context, SignUpScreen.routeName);
+  }
 
   void signIn() async {
     FormState? currentState = state.formKey.currentState;
