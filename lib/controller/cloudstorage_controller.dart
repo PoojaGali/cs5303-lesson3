@@ -1,3 +1,4 @@
+//import 'dart:ffi';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -12,13 +13,13 @@ class CloudStorageController {
     required String uid,
     required Function listener,
   }) async {
-    filename ??= '${Constant.PHOTO_IMAGES_FOLDER}/$uid/${Uuid().v1()}';
+    filename ??= '${Constant.PHOTO_IMAGES_FOLRDER}/$uid/${Uuid().v1()}';
     UploadTask task = FirebaseStorage.instance.ref(filename).putFile(photo);
     task.snapshotEvents.listen((TaskSnapshot event) {
       int progress = (event.bytesTransferred / event.totalBytes * 100).toInt();
       listener(progress);
     });
-    await task; // upload begins
+    await task; //upload begins
     String downloadURL =
         await FirebaseStorage.instance.ref(filename).getDownloadURL();
     return {

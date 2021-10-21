@@ -1,3 +1,5 @@
+//import 'dart:js';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/cloudstorage_controller.dart';
@@ -33,6 +35,7 @@ class _UserHomeState extends State<UserHomeScreen> {
   GlobalKey<FormState> formKey = GlobalKey();
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     con = _Controller(this);
   }
@@ -72,8 +75,15 @@ class _UserHomeState extends State<UserHomeScreen> {
                       onPressed: con.cancelDelete,
                     ),
               con.delIndexes.isEmpty
-                  ? IconButton(onPressed: con.search, icon: Icon(Icons.search))
-                  : IconButton(onPressed: con.delete, icon: Icon(Icons.delete)),
+                  ? IconButton(
+                      onPressed: con.search,
+                      icon: Icon(Icons.search),
+                    )
+                  : IconButton(
+                      onPressed: con.delete,
+                      icon: Icon(
+                        Icons.delete,
+                      )),
             ],
           ),
           drawer: Drawer(
@@ -85,7 +95,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                 ),
                 ListTile(
                   leading: Icon(Icons.people),
-                  title: Text('Shared With'),
+                  title: Text('Shared with'),
                   onTap: con.sharedWith,
                 ),
                 ListTile(
@@ -151,7 +161,9 @@ class _UserHomeState extends State<UserHomeScreen> {
 
 class _Controller {
   late _UserHomeState state;
+
   late List<PhotoMemo> photoMemoList;
+
   String? searchKeyString;
   List<int> delIndexes = [];
 
@@ -169,10 +181,9 @@ class _Controller {
             ARGS.PhotoMemoList: photoMemoList,
             ARGS.USER: state.widget.user,
           });
-      Navigator.of(state.context).pop(); // Close the drawer
-
+      Navigator.of(state.context).pop(); //close the drawer
     } catch (e) {
-      if (Constant.DEV) print('====sharedWith Error: $e');
+      if (Constant.DEV) print('========= sharedWith error: $e');
       MyDialog.showSnackBar(
         context: state.context,
         message: 'Failed to get sharedWith list: $e',
@@ -191,14 +202,14 @@ class _Controller {
         state.render(() {
           photoMemoList.removeAt(delIndexes[i]);
         });
+        //photoMemoList.removeAt(delIndexes[i]);
       } catch (e) {
-        if (Constant.DEV) print('======Failed to delete PhotoMemo: $e');
+        if (Constant.DEV) print('======== failed to delete photomemo: $e');
         MyDialog.showSnackBar(
           context: state.context,
           message: 'Failed to delete Photomemo: $e',
         );
-        break; //Quit further processing
-
+        break; //quit further processing
       }
     }
     MyDialog.circularProgressStop(state.context);
@@ -217,8 +228,8 @@ class _Controller {
         delIndexes.remove(index);
       else
         delIndexes.add(index);
-      //print('======delIndexes: $delIndexes');
     });
+    //print('========= delIndexes: $delIndexes');
   }
 
   void saveSearchKey(String? value) {
@@ -236,6 +247,7 @@ class _Controller {
         if (t.trim().isNotEmpty) keys.add(t.trim().toLowerCase());
       }
     }
+
     MyDialog.circularProgressStart(state.context);
 
     try {
