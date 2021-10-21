@@ -82,7 +82,6 @@ class FirestoreController {
         .where(PhotoMemo.SHARED_WITH, arrayContains: email)
         .orderBy(PhotoMemo.TIMESTAMP, descending: true)
         .get();
-
     var results = <PhotoMemo>[];
     querySnapshot.docs.forEach((doc) {
       var p = PhotoMemo.fromFirestoreDoc(

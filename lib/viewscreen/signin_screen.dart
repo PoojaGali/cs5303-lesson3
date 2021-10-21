@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
@@ -10,7 +9,7 @@ import 'package:lesson3/viewscreen/userhome_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 
 class SignInScreen extends StatefulWidget {
-  static const routeName = '/signInScreen';
+  static const routeName = '/SignInScreen';
   @override
   State<StatefulWidget> createState() {
     return _SignInState();
@@ -19,7 +18,8 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInState extends State<SignInScreen> {
   late _Controller con;
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -36,21 +36,22 @@ class _SignInState extends State<SignInScreen> {
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Form(
-          key: formKey,
+          key: formkey,
           child: SingleChildScrollView(
             child: Column(
               children: [
                 Text(
                   'Photo Memo',
-                  style: TextStyle(fontFamily: 'RockSalt', fontSize: 40.0),
+                  style: TextStyle(fontFamily: 'Italianno', fontSize: 40.0),
                 ),
                 Text(
-                  'Sign In, Please!',
-                  style: TextStyle(fontFamily: 'RockSalt', fontSize: 24.0),
+                  'Sign In Please!',
+                  style: TextStyle(fontFamily: 'Italianno', fontSize: 40.0),
                 ),
                 TextFormField(
                   decoration: InputDecoration(
-                      icon: Icon(Icons.email), hintText: 'Enter Email'),
+                    hintText: 'Email Address',
+                  ),
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   validator: con.validateEmail,
@@ -58,7 +59,8 @@ class _SignInState extends State<SignInScreen> {
                 ),
                 TextFormField(
                   decoration: InputDecoration(
-                      icon: Icon(Icons.lock), hintText: 'Enter Password'),
+                    hintText: 'Enter Password',
+                  ),
                   obscureText: true,
                   autocorrect: false,
                   validator: con.validatePassword,
@@ -66,7 +68,10 @@ class _SignInState extends State<SignInScreen> {
                 ),
                 ElevatedButton(
                   onPressed: con.signIn,
-                  child: Text('Sign In'),
+                  child: Text(
+                    'Sign In',
+                    style: Theme.of(context).textTheme.button,
+                  ),
                 ),
                 SizedBox(
                   height: 20.0,
@@ -77,7 +82,7 @@ class _SignInState extends State<SignInScreen> {
                     'Create a new account',
                     style: Theme.of(context).textTheme.button,
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -90,7 +95,6 @@ class _SignInState extends State<SignInScreen> {
 class _Controller {
   late _SignInState state;
   _Controller(this.state);
-
   String? email;
   String? password;
 
@@ -98,21 +102,48 @@ class _Controller {
     Navigator.pushNamed(state.context, SignUpScreen.routeName);
   }
 
+  String? validateEmail(String? value) {
+    if (value == null || !(value.contains('@') && value.contains('.')))
+      return 'Invalid Email';
+    else
+      return null;
+  }
+
+  void saveEmail(String? value) {
+    if (value != null) email = value;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.length < 6)
+      return 'Invalid Password';
+    else
+      return null;
+  }
+
+  void savePassword(String? value) {
+    if (value != null) password = value;
+  }
+
   void signIn() async {
-    FormState? currentState = state.formKey.currentState;
-    if (currentState == null || !currentState.validate()) return;
+    FormState? currentState = state.formkey.currentState;
+    if (currentState == null) return;
+    if (!currentState.validate()) return;
     currentState.save();
+
     User? user;
     MyDialog.circularProgressStart(state.context);
     try {
       if (email == null || password == null) {
-        throw 'email or password is null';
+        throw 'Email or password is null';
       }
       user = await FirebaseAuthController.signIn(
           email: email!, password: password!);
+      // print('=====${user?.email}');
       List<PhotoMemo> photoMemoList =
           await FirestoreController.getPhotoMemoList(email: email!);
+
       MyDialog.circularProgressStop(state.context);
+
       Navigator.pushNamed(
         state.context,
         UserHomeScreen.routeName,
@@ -123,34 +154,13 @@ class _Controller {
       );
     } catch (e) {
       MyDialog.circularProgressStop(state.context);
-      if (Constant.DEV) print('====signIn Error: $e');
+
+      if (Constant.DEV) print('=====SignIn error :$e');
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Sign In Error: $e',
+        message: 'Sign In Error:$e',
         seconds: 30,
       );
     }
-  }
-
-  String? validateEmail(String? value) {
-    if (value == null || !(value.contains('@') && value.contains('.')))
-      return 'Invalid Email address';
-    else
-      return null;
-  }
-
-  String? validatePassword(String? value) {
-    if (value == null || value.length < 6)
-      return 'Invalid Password';
-    else
-      return null;
-  }
-
-  void saveEmail(String? value) {
-    if (value != null) email = value;
-  }
-
-  void savePassword(String? value) {
-    if (value != null) password = value;
   }
 }

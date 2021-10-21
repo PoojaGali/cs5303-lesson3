@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/model/constant.dart';
@@ -6,6 +5,7 @@ import 'package:lesson3/viewscreen/view/mydialog.dart';
 
 class SignUpScreen extends StatefulWidget {
   static const routeName = '/signUpScreen';
+
   @override
   State<StatefulWidget> createState() {
     return _SignUpState();
@@ -27,22 +27,24 @@ class _SignUpState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('create a new account'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Form(
+        appBar: AppBar(
+          title: Text('Create a new Account'),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Form(
               key: formKey,
               child: Column(
                 children: [
                   Text(
-                    'create an account',
+                    'Create an account',
                     style: Theme.of(context).textTheme.headline5,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(hintText: 'Enter email'),
+                    decoration: InputDecoration(
+                      hintText: 'Enter email',
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     autocorrect: false,
                     validator: con.validateEmail,
@@ -50,7 +52,7 @@ class _SignUpState extends State<SignUpScreen> {
                   ),
                   TextFormField(
                     decoration: InputDecoration(
-                      hintText: 'Enter Password',
+                      hintText: 'Enter password',
                     ),
                     autocorrect: false,
                     obscureText: true,
@@ -59,7 +61,7 @@ class _SignUpState extends State<SignUpScreen> {
                   ),
                   TextFormField(
                     decoration: InputDecoration(
-                      hintText: 'Confirm Password',
+                      hintText: 'Confirm password',
                     ),
                     autocorrect: false,
                     obscureText: true,
@@ -74,60 +76,60 @@ class _SignUpState extends State<SignUpScreen> {
                     ),
                   ),
                 ],
-              )),
-        ),
-      ),
-    );
+              ),
+            ),
+          ),
+        ));
   }
 }
 
 class _Controller {
   late _SignUpState state;
-  _Controller(this.state);
   String? email;
   String? password;
-  String? passwordconfirm;
+  String? passwordConfirm;
+
+  _Controller(this.state);
 
   void signUp() async {
     FormState? currentState = state.formKey.currentState;
-    if (currentState == null || currentState.validate()) return;
+    if (currentState == null || !currentState.validate()) return;
     currentState.save();
-    if (password != passwordconfirm) {
+    if (password != passwordConfirm) {
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'password and confirm do not match',
+        message: 'Password and confirm password do not match',
         seconds: 15,
       );
       return;
     }
+
     try {
       await FirebaseAuthController.createAccount(
-        email: email!,
-        password: password!,
-      );
+          email: email!, password: password!);
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Account Created: Sign in to use the app',
+        message: 'Account Created! Sign in to use the app.',
       );
     } catch (e) {
-      if (Constant.DEV) print('=== create account error: $e');
+      if (Constant.DEV) print('===create account error:$e');
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Cannot create account: $e',
+        message: 'Cannot create an account: $e',
       );
     }
   }
 
   String? validateEmail(String? value) {
     if (value == null || !(value.contains('.') && value.contains('@')))
-      return 'Invalid email address';
+      return 'Invalid Email Address';
     else
       return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.length < 6)
-      return 'password too short';
+      return 'Password too short';
     else
       return null;
   }
@@ -141,6 +143,6 @@ class _Controller {
   }
 
   void saveConfirmPassword(String? value) {
-    passwordconfirm = value;
+    passwordConfirm = value;
   }
 }

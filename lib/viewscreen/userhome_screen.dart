@@ -5,7 +5,6 @@ import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
-
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
 import 'package:lesson3/viewscreen/sharedwith_screen.dart';
@@ -69,18 +68,12 @@ class _UserHomeState extends State<UserHomeScreen> {
                       ),
                     )
                   : IconButton(
-                      onPressed: con.cancelDelete,
                       icon: Icon(Icons.cancel),
+                      onPressed: con.cancelDelete,
                     ),
               con.delIndexes.isEmpty
-                  ? IconButton(
-                      onPressed: con.search,
-                      icon: Icon(Icons.search),
-                    )
-                  : IconButton(
-                      onPressed: con.delete,
-                      icon: Icon(Icons.delete),
-                    )
+                  ? IconButton(onPressed: con.search, icon: Icon(Icons.search))
+                  : IconButton(onPressed: con.delete, icon: Icon(Icons.delete)),
             ],
           ),
           drawer: Drawer(
@@ -158,9 +151,7 @@ class _UserHomeState extends State<UserHomeScreen> {
 
 class _Controller {
   late _UserHomeState state;
-
   late List<PhotoMemo> photoMemoList;
-
   String? searchKeyString;
   List<int> delIndexes = [];
 
@@ -171,25 +162,22 @@ class _Controller {
   void sharedWith() async {
     try {
       List<PhotoMemo> photoMemoList =
-          await FirestoreController.getPhotoMemoList(email: state.widget.email);
-      Navigator.pushNamed(state.context, SharedWithScreen.routeName,
+          await FirestoreController.getPhotoMemoListSharedWith(
+              email: state.widget.email);
+      await Navigator.pushNamed(state.context, SharedWithScreen.routeName,
           arguments: {
             ARGS.PhotoMemoList: photoMemoList,
             ARGS.USER: state.widget.user,
           });
+      Navigator.of(state.context).pop(); // Close the drawer
+
     } catch (e) {
-      if (Constant.DEV) print('===== sharedWith error: $e');
+      if (Constant.DEV) print('====sharedWith Error: $e');
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Failed to get sharedwith list: $e',
+        message: 'Failed to get sharedWith list: $e',
       );
     }
-  }
-
-  void cancelDelete() {
-    state.render(() {
-      delIndexes.clear();
-    });
   }
 
   void delete() async {
@@ -204,20 +192,23 @@ class _Controller {
           photoMemoList.removeAt(delIndexes[i]);
         });
       } catch (e) {
-        if (Constant.DEV) print('===== failed to delete photomemo: $e');
+        if (Constant.DEV) print('======Failed to delete PhotoMemo: $e');
         MyDialog.showSnackBar(
           context: state.context,
-          message: 'failed to delete photomemo: $e',
+          message: 'Failed to delete Photomemo: $e',
         );
-        break; //quit further processing
+        break; //Quit further processing
+
       }
     }
     MyDialog.circularProgressStop(state.context);
     state.render(() => delIndexes.clear());
   }
 
-  void saveSearchKey(String? value) {
-    searchKeyString = value;
+  void cancelDelete() {
+    state.render(() {
+      delIndexes.clear();
+    });
   }
 
   void onLongPress(int index) {
@@ -226,7 +217,12 @@ class _Controller {
         delIndexes.remove(index);
       else
         delIndexes.add(index);
+      //print('======delIndexes: $delIndexes');
     });
+  }
+
+  void saveSearchKey(String? value) {
+    searchKeyString = value;
   }
 
   void search() async {
@@ -240,8 +236,8 @@ class _Controller {
         if (t.trim().isNotEmpty) keys.add(t.trim().toLowerCase());
       }
     }
-
     MyDialog.circularProgressStart(state.context);
+
     try {
       late List<PhotoMemo> results;
       if (keys.isEmpty) {
