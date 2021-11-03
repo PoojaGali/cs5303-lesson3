@@ -42,7 +42,7 @@ class _SignInState extends State<SignInScreen> {
             child: Column(
               children: [
                 Text(
-                  'PhotoMemo',
+                  'Photogram',
                   style: TextStyle(fontFamily: 'RockSalt', fontSize: 40.0),
                 ),
                 Text(
