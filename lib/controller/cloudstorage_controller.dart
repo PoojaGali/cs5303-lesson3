@@ -13,7 +13,7 @@ class CloudStorageController {
     required String uid,
     required Function listener,
   }) async {
-    filename ??= '${Constant.PHOTO_IMAGES_FOLRDER}/$uid/${Uuid().v1()}';
+    filename ??= '${Constant.PHOTO_IMAGES_FOLDER}/$uid/${Uuid().v1()}';
     UploadTask task = FirebaseStorage.instance.ref(filename).putFile(photo);
     task.snapshotEvents.listen((TaskSnapshot event) {
       int progress = (event.bytesTransferred / event.totalBytes * 100).toInt();

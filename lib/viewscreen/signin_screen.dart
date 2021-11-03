@@ -94,7 +94,7 @@ class _SignInState extends State<SignInScreen> {
 }
 
 class _Controller {
-  late _SignInState state;
+  _SignInState state;
   _Controller(this.state);
   String? email;
   String? password;

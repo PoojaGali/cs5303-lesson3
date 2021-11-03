@@ -1,9 +1,12 @@
 //import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 //import 'package:flutter/cupertino.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/photocomment.dart';
 import 'package:lesson3/model/photomemo.dart';
+import 'package:lesson3/model/profile.dart';
 
 class FirestoreController {
   static Future<String> addPhotoMemo({
@@ -13,6 +16,48 @@ class FirestoreController {
         .collection(Constant.PHOTOMEMO_COLLECTION)
         .add(photoMemo.toFirestoreDoc());
     return ref.id; //doc id
+  }
+
+  static Future<List<Profile>> getOneProfile(String email) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.PROFILE)
+        .where(Profile.USER_EMAIL, isEqualTo: email)
+        .get();
+
+    var result = <Profile>[];
+    querySnapshot.docs.forEach(
+      (doc) {
+        result.add(Profile.fromFirestoreDoc(
+            doc.data() as Map<String, dynamic>, doc.id));
+      },
+    );
+    return result;
+  }
+
+  static Future<String> addPhotoComment(PhotoComment comment) async {
+    var ref = await FirebaseFirestore.instance
+        .collection(Constant.PHOTOMEMO_COMMENT)
+        .add(comment.toFirestoreDoc());
+    return ref.id;
+  }
+
+  static Future<List<PhotoComment>> getPhotoCommentList(
+      {@required String? originalPoster, @required String? memoId}) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.PHOTOMEMO_COMMENT)
+        .where(PhotoComment.ORIGINAL_POSTER, isEqualTo: originalPoster)
+        .where(PhotoComment.PHOTOMEMO_ID, isEqualTo: memoId)
+        .orderBy(PhotoMemo.TIMESTAMP, descending: true)
+        .get();
+
+    var result = <PhotoComment>[];
+    querySnapshot.docs.forEach(
+      (doc) {
+        result.add(PhotoComment.fromFirestoreDoc(
+            doc.data() as Map<String, dynamic>, doc.id));
+      },
+    );
+    return result;
   }
 
   static Future<List<PhotoMemo>> getPhotoMemoList({
@@ -36,6 +81,29 @@ class FirestoreController {
       }
     });
     return result;
+  }
+
+  static Future<List<Profile>> getProfileList() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.PROFILE)
+        .orderBy(Profile.USER_EMAIL, descending: true)
+        .get();
+
+    var result = <Profile>[];
+    querySnapshot.docs.forEach(
+      (doc) {
+        result.add(Profile.fromFirestoreDoc(
+            doc.data() as Map<String, dynamic>, doc.id));
+      },
+    );
+    return result;
+  }
+
+  static Future<String> createProfile(Profile profile) async {
+    var ref = await FirebaseFirestore.instance
+        .collection(Constant.PROFILE)
+        .add(profile.toFirestoreDoc());
+    return ref.id;
   }
 
   static Future<void> updatePhotoMemo({

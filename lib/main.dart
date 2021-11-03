@@ -4,9 +4,11 @@ import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
 import 'package:lesson3/viewscreen/internalerror_screen.dart';
+import 'package:lesson3/viewscreen/profile_screen.dart';
 import 'package:lesson3/viewscreen/sharedwith_screen.dart';
 import 'package:lesson3/viewscreen/signin_screen.dart';
 import 'package:lesson3/viewscreen/signup_screen.dart';
+import 'package:lesson3/viewscreen/user_profiles.dart';
 import 'package:lesson3/viewscreen/userhome_screen.dart';
 
 void main() async {
@@ -63,21 +65,10 @@ class Lesson3App extends StatelessWidget {
               );
             }
           },
-          DetailedViewScreen.routeName: (context) {
-            Object? args = ModalRoute.of(context)?.settings.arguments;
-            if (args == null) {
-              return InternalErrorScreen('args is null at DetailedViewScreen');
-            } else {
-              var argument = args as Map;
-              var user = argument[ARGS.USER];
-              var photoMemo = argument[ARGS.OnePhotoMemo];
-              return DetailedViewScreen(
-                user: user,
-                photoMemo: photoMemo,
-              );
-            }
-          },
+          DetailedViewScreen.routeName: (context) => DetailedViewScreen(),
           SignUpScreen.routeName: (context) => SignUpScreen(),
+          ProfileScreen.routeName: (context) => ProfileScreen(),
+          UserProfileScreen.routeName: (context) => UserProfileScreen(),
         });
   }
 }

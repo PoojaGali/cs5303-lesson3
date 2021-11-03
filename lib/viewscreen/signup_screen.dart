@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
+import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/profile.dart';
+import 'package:lesson3/viewscreen/signin_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -88,6 +91,7 @@ class _Controller {
   String? email;
   String? password;
   String? passwordConfirm;
+  Profile tempProfile = Profile();
 
   _Controller(this.state);
 
@@ -104,9 +108,16 @@ class _Controller {
       return;
     }
 
+    tempProfile.signUpDate = DateTime.now();
+    tempProfile.name = "";
+    tempProfile.email = email!;
+    tempProfile.description = "";
+
     try {
       await FirebaseAuthController.createAccount(
           email: email!, password: password!);
+      await FirestoreController.createProfile(tempProfile);
+      Navigator.pushNamed(state.context, SignInScreen.routeName);
       MyDialog.showSnackBar(
         context: state.context,
         message: 'Account Created! Sign in to use the app.',

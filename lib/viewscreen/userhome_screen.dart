@@ -6,10 +6,14 @@ import 'package:lesson3/controller/cloudstorage_controller.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/photocomment.dart';
 import 'package:lesson3/model/photomemo.dart';
+import 'package:lesson3/model/profile.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
+import 'package:lesson3/viewscreen/profile_screen.dart';
 import 'package:lesson3/viewscreen/sharedwith_screen.dart';
+import 'package:lesson3/viewscreen/user_profiles.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 import 'package:lesson3/viewscreen/view/webimage.dart';
 
@@ -18,7 +22,7 @@ class UserHomeScreen extends StatefulWidget {
   final User user;
   late final String displayName;
   late final String email;
-  final List<PhotoMemo> photoMemoList;
+  List<PhotoMemo> photoMemoList;
   UserHomeScreen({required this.user, required this.photoMemoList}) {
     displayName = user.displayName ?? 'N/A';
     email = user.email ?? 'no email';
@@ -32,10 +36,12 @@ class UserHomeScreen extends StatefulWidget {
 class _UserHomeState extends State<UserHomeScreen> {
   @override
   late _Controller con;
+  List<PhotoMemo>? photoMemoList;
+  late User user;
+  int index = 0;
   GlobalKey<FormState> formKey = GlobalKey();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     con = _Controller(this);
   }
@@ -44,6 +50,9 @@ class _UserHomeState extends State<UserHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Map args = ModalRoute.of(context)!.settings.arguments as Map;
+    user = args[ARGS.USER];
+    photoMemoList = args[ARGS.PhotoMemoList];
     return WillPopScope(
       onWillPop: () =>
           Future.value(false), //disable Android sysytem back button
@@ -57,7 +66,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 6.0),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.7,
+                          width: MediaQuery.of(context).size.width * 0.6,
                           child: TextFormField(
                             decoration: InputDecoration(
                               hintText: 'Search (empty for all)',
@@ -84,6 +93,12 @@ class _UserHomeState extends State<UserHomeScreen> {
                       icon: Icon(
                         Icons.delete,
                       )),
+              IconButton(
+                onPressed: con.viewAllProfiles,
+                icon: Icon(
+                  Icons.person,
+                ),
+              ),
             ],
           ),
           drawer: Drawer(
@@ -162,13 +177,27 @@ class _UserHomeState extends State<UserHomeScreen> {
 class _Controller {
   late _UserHomeState state;
 
-  late List<PhotoMemo> photoMemoList;
+  List<PhotoMemo> photoMemoList = [];
+  List<PhotoComment> photoCommentList = [];
+  List<Profile> profileList = [];
 
   String? searchKeyString;
   List<int> delIndexes = [];
 
-  _Controller(this.state) {
-    photoMemoList = state.widget.photoMemoList;
+  _Controller(this.state);
+
+  void viewMyProfile(User user) async {
+    List<Profile> myProfile =
+        await FirestoreController.getOneProfile(user.email!);
+
+    Navigator.pushNamed(
+      state.context,
+      ProfileScreen.routeName,
+      arguments: {
+        Constant.ARG_ONE_PROFILE: myProfile[1],
+      },
+    );
+    state.render(() {});
   }
 
   void sharedWith() async {
@@ -180,6 +209,7 @@ class _Controller {
           arguments: {
             ARGS.PhotoMemoList: photoMemoList,
             ARGS.USER: state.widget.user,
+            Constant.ARG_PHOTOCOMMENTLIST: photoCommentList,
           });
       Navigator.of(state.context).pop(); //close the drawer
     } catch (e) {
@@ -236,6 +266,21 @@ class _Controller {
     searchKeyString = value;
   }
 
+  void viewAllProfiles() async {
+    try {
+      profileList = await FirestoreController.getProfileList();
+      await Navigator.pushNamed(state.context, UserProfileScreen.routeName,
+          arguments: {
+            Constant.PROFILE: profileList,
+          });
+      Navigator.pop(state.context); //closes drawer
+    } catch (e) {
+      MyDialog.circularProgressStop(state.context);
+      MyDialog.info(
+          context: state.context, title: 'getProfileList error', content: '$e');
+    }
+  }
+
   void search() async {
     FormState? currentState = state.formKey.currentState;
     if (currentState == null) return;
@@ -275,27 +320,25 @@ class _Controller {
   }
 
   void onTap(int index) async {
-    if (delIndexes.isNotEmpty) {
-      onLongPress(index);
-      return;
+    try {
+      photoCommentList = await FirestoreController.getPhotoCommentList(
+          originalPoster: state.photoMemoList![index].createdBy,
+          memoId: state.photoMemoList![index].docId);
+    } catch (e) {
+      MyDialog.circularProgressStop(state.context);
+      MyDialog.info(
+          context: state.context,
+          title: 'getPhotoCommentList error',
+          content: '$e');
     }
+    if (delIndexes != null) return;
     await Navigator.pushNamed(state.context, DetailedViewScreen.routeName,
         arguments: {
-          ARGS.USER: state.widget.user,
-          ARGS.OnePhotoMemo: photoMemoList[index],
+          ARGS.USER: state.user,
+          ARGS.OnePhotoMemo: state.photoMemoList![index],
+          Constant.ARG_PHOTOCOMMENTLIST: photoCommentList,
         });
-    //rerender home screen
-    state.render(() {
-      //reorder based on the updated timestamp
-      photoMemoList.sort((a, b) {
-        if (a.timestamp!.isBefore(b.timestamp!))
-          return 1; //descending order
-        else if (a.timestamp!.isAfter(b.timestamp!))
-          return -1;
-        else
-          return 0;
-      });
-    });
+    state.render(() {});
   }
 
   void addButton() async {

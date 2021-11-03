@@ -11,6 +11,7 @@ import 'package:lesson3/controller/cloudstorage_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
 import 'package:lesson3/controller/googleML_controller.dart';
 import 'package:lesson3/model/constant.dart';
+import 'package:lesson3/model/photocomment.dart';
 import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
 import 'package:lesson3/viewscreen/view/webimage.dart';
@@ -18,10 +19,8 @@ import 'package:lesson3/viewscreen/view/webimage.dart';
 class DetailedViewScreen extends StatefulWidget {
   static const routeName = '/detailedViewScreen';
 
-  final User user;
-  final PhotoMemo photoMemo;
-
-  DetailedViewScreen({required this.user, required this.photoMemo});
+  late User user;
+  late PhotoMemo photoMemo;
 
   @override
   State<StatefulWidget> createState() {
@@ -31,13 +30,16 @@ class DetailedViewScreen extends StatefulWidget {
 
 class _DetailedViewState extends State<DetailedViewScreen> {
   late _Controller con;
+  late User user;
+  late PhotoMemo onePhotoMemoOriginal;
+  late PhotoMemo onePhotoMemoTemp;
+  List<PhotoComment> photoCommentList = [];
   bool editMode = false;
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? progressMessage;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     con = _Controller(this);
   }
@@ -46,6 +48,11 @@ class _DetailedViewState extends State<DetailedViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Map args = ModalRoute.of(context)!.settings.arguments as Map;
+    user = args[ARGS.USER];
+    photoCommentList = args[Constant.ARG_PHOTOCOMMENTLIST];
+    onePhotoMemoOriginal = args[ARGS.OnePhotoMemo];
+    onePhotoMemoTemp = PhotoMemo.clone(onePhotoMemoOriginal);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -150,6 +157,69 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                   : SizedBox(
                       height: 1.0,
                     ),
+              SizedBox(
+                height: 5.0,
+              ),
+              Container(
+                color: Colors.purpleAccent,
+                child: Row(
+                  children: [
+                    Text(
+                      '   COMMENTS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 60,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 5.0,
+              ),
+              photoCommentList.length == 0
+                  ? Text('No Comments Found',
+                      style: Theme.of(context).textTheme.headline5)
+                  : ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: photoCommentList.length,
+                      itemBuilder: (BuildContext context, int index) =>
+                          Container(
+                        color: index == 0 || index % 2 == 0
+                            ? Colors.purple[200]
+                            : Colors.indigo[200],
+                        child: ListTile(
+                          title: Text(photoCommentList[index].createdBy,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.black,
+                              )),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Created On: ${photoCommentList[index].timestamp}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                photoCommentList[index].content,
+                                style: TextStyle(
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.indigo[900],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
             ],
           ),
         ),
@@ -235,7 +305,7 @@ class _Controller {
       if (Constant.DEV) print('========= update photomemo error: $e');
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Upsate Photomemo error. $e',
+        message: 'Update Photomemo error. $e',
       );
     }
     // state.render(() => state.editMode = false);

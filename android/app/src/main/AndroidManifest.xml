@@ -4,6 +4,7 @@
       <action android:name="android.media.action.IMAGE_CAPTURE" />
     </intent>
   </queries>
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <application android:label="lesson3" android:icon="@mipmap/ic_launcher">
     <activity android:name=".MainActivity" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
       <!-- Specifies an Android theme to apply to this Activity as soon as

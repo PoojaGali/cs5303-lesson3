@@ -14,7 +14,7 @@ import 'package:lesson3/viewscreen/view/mydialog.dart';
 class AddNewPhotoMemoScreen extends StatefulWidget {
   static const routeName = '/addNewPhotoMemoScreen';
   late final User user;
-  final List<PhotoMemo> photoMemoList;
+  List<PhotoMemo> photoMemoList;
   AddNewPhotoMemoScreen({required this.user, required this.photoMemoList});
 
   @override
@@ -29,7 +29,6 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
   GlobalKey<FormState> formkey = GlobalKey();
   File? photo;
   void initState() {
-    // TODO: implement initState
     super.initState();
     con = _Controller(this);
 
