@@ -71,6 +71,22 @@ class _SignUpState extends State<SignUpScreen> {
                     validator: con.validatePassword,
                     onSaved: con.saveConfirmPassword,
                   ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: 'Name',
+                    ),
+                    autocorrect: false,
+                    obscureText: true,
+                    onSaved: con.saveName,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      hintText: 'Bio',
+                    ),
+                    autocorrect: false,
+                    obscureText: true,
+                    onSaved: con.saveBio,
+                  ),
                   ElevatedButton(
                     onPressed: con.signUp,
                     child: Text(
@@ -90,6 +106,8 @@ class _Controller {
   late _SignUpState state;
   String? email;
   String? password;
+  String? name;
+  String? bio;
   String? passwordConfirm;
   Profile tempProfile = Profile();
 
@@ -109,9 +127,9 @@ class _Controller {
     }
 
     tempProfile.signUpDate = DateTime.now();
-    tempProfile.name = "";
+    tempProfile.name = name!;
     tempProfile.email = email!;
-    tempProfile.description = "";
+    tempProfile.description = bio!;
 
     try {
       await FirebaseAuthController.createAccount(
@@ -147,6 +165,14 @@ class _Controller {
 
   void saveEmail(String? value) {
     email = value;
+  }
+
+  void saveName(String? value) {
+    name = value;
+  }
+
+  void saveBio(String? value) {
+    bio = value;
   }
 
   void savePassword(String? value) {
