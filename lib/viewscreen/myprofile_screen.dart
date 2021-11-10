@@ -154,7 +154,7 @@ class _Controller {
       if (photo != null) {
         Map photoInfo = await CloudStorageController.uploadProfilePic(
           photo: photo!,
-          filename: profile.photoFilename,
+          // filename: profile.photoFilename,
           uid: state.widget.user.uid,
           listener: (int progress) {
             state.render(() {
