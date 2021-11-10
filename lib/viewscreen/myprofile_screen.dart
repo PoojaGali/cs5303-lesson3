@@ -98,10 +98,20 @@ class _MyProfileState extends State<MyProfileScreen> {
                         height: 1.0,
                       ),
                 Text(
-                  'Title: ${profile.email}',
+                  'E-mail:',
+                  style: TextStyle(color: Colors.red),
+                ),
+                Text(
+                  '${profile.email}',
                   style: Theme.of(context).textTheme.headline6,
                 ),
-                // Text('Name: ${profile.name}'),
+                SizedBox(
+                  height: 1.0,
+                ),
+                Text(
+                  'Name',
+                  style: TextStyle(color: Colors.red),
+                ),
                 TextFormField(
                   enabled: editMode,
                   style: Theme.of(context).textTheme.headline6,
@@ -112,8 +122,13 @@ class _MyProfileState extends State<MyProfileScreen> {
                   autocorrect: true,
                   onSaved: con.saveName,
                 ),
-                Text('Member Since: ${profile.signUpDate}'),
-                // Text('About Me: ${profile.description}'),
+                SizedBox(
+                  height: 1.0,
+                ),
+                Text(
+                  'Bio',
+                  style: TextStyle(color: Colors.red),
+                ),
                 TextFormField(
                   enabled: editMode,
                   style: Theme.of(context).textTheme.headline6,
@@ -123,6 +138,14 @@ class _MyProfileState extends State<MyProfileScreen> {
                   initialValue: con.profile.description,
                   autocorrect: true,
                   onSaved: con.saveDescription,
+                ),
+                Text(
+                  'Member Since:',
+                  style: TextStyle(color: Colors.red),
+                ),
+                Text(
+                  '${profile.signUpDate}',
+                  style: Theme.of(context).textTheme.headline6,
                 ),
                 SizedBox(
                   height: 30.0,
