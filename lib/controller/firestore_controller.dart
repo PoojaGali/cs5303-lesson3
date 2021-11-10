@@ -65,7 +65,6 @@ class FirestoreController {
   }) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection(Constant.PHOTOMEMO_COLLECTION)
-        //.collection(Constant.PHOTOMEMO_COLLECTION)
         .where(PhotoMemo.CREATED_BY, isEqualTo: email)
         .orderBy(PhotoMemo.TIMESTAMP, descending: true)
         .get();
@@ -112,6 +111,16 @@ class FirestoreController {
   }) async {
     await FirebaseFirestore.instance
         .collection(Constant.PHOTOMEMO_COLLECTION)
+        .doc(docId)
+        .update(updateInfo);
+  }
+
+  static Future<void> updateProfile({
+    required String docId,
+    required Map<String, dynamic> updateInfo,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection(Constant.PROFILE)
         .doc(docId)
         .update(updateInfo);
   }

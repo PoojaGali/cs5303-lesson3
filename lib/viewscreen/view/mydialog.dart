@@ -47,7 +47,7 @@ class MyDialog {
         barrierDismissible: false,
         builder: (context) =>
             AlertDialog(title: Text(title), content: Text(content), actions: [
-              FlatButton(
+              ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text('Ok', style: Theme.of(context).textTheme.button),
               ),

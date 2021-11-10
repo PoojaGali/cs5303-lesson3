@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/profile.dart';
 import 'package:lesson3/viewscreen/profile_screen.dart';
+import 'package:lesson3/viewscreen/view/webimage.dart';
 
 class UserProfileScreen extends StatefulWidget {
   static const routeName = '/viewAllProfilesScreen';
@@ -30,7 +31,6 @@ class _UserProfileState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     Map args = ModalRoute.of(context)!.settings.arguments as Map;
     profileList = args[Constant.PROFILE];
-    // photoLikeList ??= args[Constant.ARG_PHOTOMEMOLIKE];
     return Scaffold(
       appBar: AppBar(
         title: Text('View All Users'),
@@ -39,7 +39,8 @@ class _UserProfileState extends State<UserProfileScreen> {
         itemCount: profileList!.length,
         itemBuilder: (context, index) => GestureDetector(
           child: ListTile(
-            leading: Image.asset('images/profilepic.png'),
+            leading:
+                WebImage(url: profileList![index].photoURL, context: context),
             trailing: Icon(Icons.keyboard_arrow_right),
             title: Text(
               '${profileList![index].email}',
