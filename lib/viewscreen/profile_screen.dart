@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/profile.dart';
+import 'package:lesson3/viewscreen/view/webimage.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = './profileScreen';
@@ -42,7 +43,7 @@ class _ProfileState extends State<ProfileScreen> {
                 Center(
                   child: Container(
                     height: MediaQuery.of(context).size.height * .4,
-                    child: Image.asset('images/profilepic.png'),
+                    child: WebImage(url: profile.photoURL, context: context),
                   ),
                 ),
                 Text(
