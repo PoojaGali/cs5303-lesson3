@@ -166,6 +166,11 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                   : SizedBox(
                       height: 1.0,
                     ),
+              Constant.DEV
+                  ? Text('Text Labels by ML\n${con.tempMemo.readText}')
+                  : SizedBox(
+                      height: 1.0,
+                    ),
               SizedBox(
                 height: 5.0,
               ),

@@ -22,4 +22,25 @@ class GoogleMLController {
     }
     return results;
   }
+
+  static Future<List<String>> readText({
+    required File photo,
+  }) async {
+    var inputImage = InputImage.fromFile(photo);
+    final textRecognizer = GoogleMlKit.vision.textDetector();
+    final RecognisedText readText =
+        (await textRecognizer.processImage(inputImage));
+    textRecognizer.close();
+
+    var results = <String>[];
+
+    for (TextBlock block in readText.blocks) {
+      for (TextLine line in block.lines) {
+        for (TextElement word in line.elements) {
+          results.add(word.text);
+        }
+      }
+    }
+    return results;
+  }
 }

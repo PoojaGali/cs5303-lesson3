@@ -160,6 +160,9 @@ class _Controller {
       List<String> recognitions =
           await GoogleMLController.getImageLabels(photo: state.photo!);
       tempMemo.imageLabels.addAll(recognitions);
+      List<String> textrecognitions =
+          await GoogleMLController.readText(photo: state.photo!);
+      tempMemo.readText.addAll(textrecognitions);
       tempMemo.photoFilename = photoInfo[ARGS.Filename];
       tempMemo.photoURL = photoInfo[ARGS.DownloadURL];
       tempMemo.createdBy = state.widget.user.email!;
