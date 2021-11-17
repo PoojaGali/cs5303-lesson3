@@ -4,6 +4,7 @@ import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/profile.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
+import 'package:lesson3/viewscreen/detailshared_screen.dart';
 import 'package:lesson3/viewscreen/internalerror_screen.dart';
 import 'package:lesson3/viewscreen/myprofile_screen.dart';
 import 'package:lesson3/viewscreen/profile_screen.dart';
@@ -50,7 +51,10 @@ class Lesson3App extends StatelessWidget {
               var argument = args as Map;
               var user = argument[ARGS.USER];
               var photoMemoList = argument[ARGS.PhotoMemoList];
-              return SharedWithScreen(user: user, photoMemoList: photoMemoList);
+              return SharedWithScreen(
+                photoMemoList: photoMemoList,
+                user: user,
+              );
             }
           },
           AddNewPhotoMemoScreen.routeName: (context) {
@@ -67,7 +71,40 @@ class Lesson3App extends StatelessWidget {
               );
             }
           },
-          DetailedViewScreen.routeName: (context) => DetailedViewScreen(),
+          DetailedViewScreen.routeName: (context) {
+            Object? args = ModalRoute.of(context)?.settings.arguments;
+            if (args == null) {
+              return InternalErrorScreen(
+                  'args is null at Detailed View Screen');
+            } else {
+              var argument = args as Map;
+              var user = argument[ARGS.USER];
+              var photoMemo = argument[ARGS.OnePhotoMemo];
+              var photoCommentList = argument[Constant.ARG_PHOTOCOMMENTLIST];
+              return DetailedViewScreen(
+                user: user,
+                photoMemo: photoMemo,
+                photoCommentList: photoCommentList,
+              );
+            }
+          },
+          DetailSharedScreen.routeName: (context) {
+            Object? args = ModalRoute.of(context)?.settings.arguments;
+            if (args == null) {
+              return InternalErrorScreen(
+                  'args is null at Detailed View Screen');
+            } else {
+              var argument = args as Map;
+              var user = argument[ARGS.USER];
+              var photoMemo = argument[ARGS.OnePhotoMemo];
+              var photoCommentList = argument[Constant.ARG_PHOTOCOMMENTLIST];
+              return DetailSharedScreen(
+                user: user,
+                photoMemo: photoMemo,
+                photoCommentList: photoCommentList,
+              );
+            }
+          },
           SignUpScreen.routeName: (context) => SignUpScreen(),
           ProfileScreen.routeName: (context) => ProfileScreen(),
           MyProfileScreen.routeName: (context) {

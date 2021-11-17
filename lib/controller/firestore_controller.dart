@@ -115,6 +115,16 @@ class FirestoreController {
         .update(updateInfo);
   }
 
+  static Future<void> updateNotification({
+    required String docId,
+    required Map<String, dynamic> updateInfo,
+  }) async {
+    await FirebaseFirestore.instance
+        .collection(Constant.PHOTOMEMO_COLLECTION)
+        .doc(docId)
+        .update(updateInfo);
+  }
+
   static Future<void> updateProfile({
     required String docId,
     required Map<String, dynamic> updateInfo,

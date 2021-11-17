@@ -21,6 +21,13 @@ class DetailedViewScreen extends StatefulWidget {
 
   late User user;
   late PhotoMemo photoMemo;
+  final List<PhotoComment> photoCommentList;
+
+  DetailedViewScreen({
+    required this.user,
+    required this.photoMemo,
+    required this.photoCommentList,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -33,8 +40,10 @@ class _DetailedViewState extends State<DetailedViewScreen> {
   late User user;
   late PhotoMemo onePhotoMemoOriginal;
   late PhotoMemo onePhotoMemoTemp;
-  List<PhotoComment> photoCommentList = [];
+  // late List<PhotoComment> photoCommentList;
   bool editMode = false;
+  String progMessage = '';
+
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? progressMessage;
 
@@ -50,7 +59,7 @@ class _DetailedViewState extends State<DetailedViewScreen> {
   Widget build(BuildContext context) {
     Map args = ModalRoute.of(context)!.settings.arguments as Map;
     user = args[ARGS.USER];
-    photoCommentList = args[Constant.ARG_PHOTOCOMMENTLIST];
+    List<PhotoComment> photoCommentList = args[Constant.ARG_PHOTOCOMMENTLIST];
     onePhotoMemoOriginal = args[ARGS.OnePhotoMemo];
     onePhotoMemoTemp = PhotoMemo.clone(onePhotoMemoOriginal);
     return Scaffold(
@@ -161,14 +170,14 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                 height: 5.0,
               ),
               Container(
-                color: Colors.purpleAccent,
+                color: Colors.blueAccent,
                 child: Row(
                   children: [
                     Text(
-                      '   COMMENTS',
+                      'Comments',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 60,
+                        fontSize: 20,
                       ),
                     ),
                   ],
@@ -186,9 +195,7 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                       itemCount: photoCommentList.length,
                       itemBuilder: (BuildContext context, int index) =>
                           Container(
-                        color: index == 0 || index % 2 == 0
-                            ? Colors.purple[200]
-                            : Colors.indigo[200],
+                        color: Colors.blue[50],
                         child: ListTile(
                           title: Text(photoCommentList[index].createdBy,
                               style: TextStyle(
@@ -202,7 +209,6 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                               Text(
                                 'Created On: ${photoCommentList[index].timestamp}',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
                                   fontSize: 15,
                                   color: Colors.black,
                                 ),
@@ -210,7 +216,7 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                               Text(
                                 photoCommentList[index].content,
                                 style: TextStyle(
-                                  fontSize: 35,
+                                  fontSize: 25,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.indigo[900],
                                 ),
@@ -220,6 +226,21 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                         ),
                       ),
                     ),
+              TextFormField(
+                decoration: InputDecoration(
+                  hintText: 'Write a comment...',
+                ),
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                onSaved: con.saveComment,
+              ),
+              ElevatedButton(
+                onPressed: con.createComment,
+                child: Text(
+                  'Send',
+                  style: Theme.of(context).textTheme.button,
+                ),
+              ),
             ],
           ),
         ),
@@ -232,9 +253,54 @@ class _Controller {
   late _DetailedViewState state;
   late PhotoMemo tempMemo;
   File? photo;
+  PhotoComment tempComment = PhotoComment();
+  String memo = '';
+  String originalPoster = '';
+  String content = '';
+  String createdBy = '';
+  var timestamp;
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   _Controller(this.state) {
     tempMemo = PhotoMemo.clone(state.widget.photoMemo);
+  }
+
+  void saveComment(String? value) {
+    tempComment.content = value!;
+  }
+
+  void createComment() async {
+    FormState? currentState = state.formKey.currentState;
+    Map<String, dynamic> updateInfo = {};
+
+    if (currentState == null || !currentState.validate()) return;
+    currentState.save();
+    MyDialog.circularProgressStart(state.context);
+
+    try {
+      state.render(() => state.progMessage = "Uploading Comment!");
+      tempMemo.newComment = 'true';
+      tempComment.timestamp = DateTime.now();
+      tempComment.originalPoster = tempMemo.createdBy;
+      tempComment.createdBy = state.user.email!;
+      tempComment.memoId = tempMemo.docId.toString();
+
+      String docId = await FirestoreController.addPhotoComment(tempComment);
+      tempComment.docId = docId;
+      await FirestoreController.updatePhotoMemo(
+        docId: tempMemo.docId!,
+        updateInfo: updateInfo,
+      );
+
+      MyDialog.circularProgressStop(state.context);
+      Navigator.pop(state.context);
+    } catch (e) {
+      MyDialog.circularProgressStop(state.context);
+      MyDialog.info(
+          context: state.context,
+          title: 'Save PhotoComment error',
+          content: '$e');
+    }
   }
 
   void getPhoto(PhotoSource source) async {
