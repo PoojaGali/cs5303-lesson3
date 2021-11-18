@@ -42,6 +42,7 @@ class _UserHomeState extends State<UserHomeScreen> {
   List<PhotoComment> photoCommentList = [];
   late User user;
   int index = 0;
+  String? dropdownValue;
   GlobalKey<FormState> formKey = GlobalKey();
   @override
   void initState() {
@@ -86,22 +87,36 @@ class _UserHomeState extends State<UserHomeScreen> {
                     icon: Icon(Icons.cancel),
                     onPressed: con.cancelDelete,
                   ),
+            DropdownButton<String>(
+              value: dropdownValue,
+              hint: Text('ML'),
+              icon: const Icon(Icons.arrow_drop_down),
+              onChanged: (String? newValue) {
+                setState(() {
+                  dropdownValue = newValue!;
+                });
+              },
+              items: <String>[
+                'Image',
+                'Text',
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
             con.delIndexes.isEmpty
                 ? IconButton(
-                    onPressed: con.search,
+                    onPressed: () => con.search(dropdownValue),
                     icon: Icon(Icons.search),
                   )
                 : IconButton(
                     onPressed: con.delete,
                     icon: Icon(
                       Icons.delete,
-                    )),
-            IconButton(
-              onPressed: () => con.viewMyProfile(user),
-              icon: Icon(
-                Icons.person,
-              ),
-            ),
+                    ),
+                  ),
           ],
         ),
         drawer: Drawer(
@@ -111,6 +126,10 @@ class _UserHomeState extends State<UserHomeScreen> {
                 accountName: Text(widget.displayName),
                 accountEmail: Text(widget.email),
               ),
+              ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text('My Profile'),
+                  onTap: () => con.viewMyProfile(user)),
               ListTile(
                 leading: Icon(Icons.people),
                 title: Text('Shared with'),
@@ -201,132 +220,6 @@ class _UserHomeState extends State<UserHomeScreen> {
   }
 }
 
-// class DetailScreen extends StatelessWidget {
-//   final PhotoMemo? memo;
-//   final _Controller? con;
-//   final List<PhotoComment>? photoCommentList;
-
-//   DetailScreen(
-//       {Key? key,
-//       @required this.memo,
-//       @required this.con,
-//       @required this.photoCommentList})
-//       : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     int index = 0;
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(memo!.title),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Padding(
-//           padding: EdgeInsets.all(16.0),
-//           // child: Text(memo.),
-//           child: Card(
-//             elevation: 7.0,
-//             child: Column(
-//               children: [
-//                 Center(
-//                   child: Container(
-//                     height: MediaQuery.of(context).size.height * .4,
-//                     child: WebImage(
-//                       url: memo!.photoURL,
-//                       context: context,
-//                     ),
-//                   ),
-//                 ),
-//                 Text(
-//                   'Title: ${memo!.title}',
-//                   style: Theme.of(context).textTheme.headline6,
-//                 ),
-//                 Text('Memo: ${memo!.memo}'),
-//                 Text('Created By: ${memo!.createdBy}'),
-//                 Text('Updated At: ${memo!.timestamp}'),
-//                 Text('Shared With: ${memo!.sharedWith}'),
-//                 SizedBox(
-//                   height: 20.0,
-//                 ),
-//                 Container(
-//                   color: Colors.blueAccent,
-//                   child: Row(
-//                     children: [
-//                       Text(
-//                         'Comments',
-//                         textAlign: TextAlign.center,
-//                         style: TextStyle(
-//                           fontSize: 20,
-//                         ),
-//                       ),
-//                       IconButton(
-//                         onPressed: () {
-//                           con!.addComment(
-//                               memo!.docId.toString(), memo!.createdBy);
-//                         },
-//                         icon: Icon(
-//                           Icons.add_comment,
-//                         ),
-//                         alignment: Alignment.centerRight,
-//                         color: Colors.pinkAccent,
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 SizedBox(
-//                   height: 5.0,
-//                 ),
-//                 photoCommentList!.length == 0
-//                     ? Text('No Comments Found',
-//                         style: Theme.of(context).textTheme.headline5)
-//                     : ListView.builder(
-//                         scrollDirection: Axis.vertical,
-//                         shrinkWrap: true,
-//                         itemCount: photoCommentList!.length,
-//                         itemBuilder: (BuildContext context, index) => Container(
-//                           color: index == 0 || index % 2 == 0
-//                               ? Colors.purple[200]
-//                               : Colors.indigo[200],
-//                           child: ListTile(
-//                             title: Text(photoCommentList![index].createdBy,
-//                                 style: TextStyle(
-//                                   fontWeight: FontWeight.bold,
-//                                   fontSize: 20,
-//                                   color: Colors.black,
-//                                 )),
-//                             subtitle: Column(
-//                               crossAxisAlignment: CrossAxisAlignment.start,
-//                               children: [
-//                                 Text(
-//                                   'Created On: ${photoCommentList![index].timestamp}',
-//                                   style: TextStyle(
-//                                     fontWeight: FontWeight.bold,
-//                                     fontSize: 15,
-//                                     color: Colors.black,
-//                                   ),
-//                                 ),
-//                                 Text(
-//                                   photoCommentList![index].content,
-//                                   style: TextStyle(
-//                                     fontSize: 35,
-//                                     fontWeight: FontWeight.bold,
-//                                     color: Colors.indigo[900],
-//                                   ),
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class _Controller {
   late _UserHomeState state;
 
@@ -364,85 +257,6 @@ class _Controller {
     );
     state.render(() {});
   }
-
-  // void createComment() async {
-  //   if (!formKey.currentState!.validate()) return;
-  //   formKey.currentState!.save();
-  //   MyDialog.circularProgressStart(state.context);
-
-  //   try {
-  //     state.render(() => state.progMessage = "Uploading Comment!");
-
-  //     tempComment.timestamp = DateTime.now();
-  //     tempComment.originalPoster = originalPoster;
-  //     tempComment.createdBy = state.user.email!;
-  //     tempComment.memoId = memo;
-
-  //     String docId = await FirestoreController.addPhotoComment(tempComment);
-  //     tempComment.docId = docId;
-
-  //     MyDialog.circularProgressStop(state.context);
-  //     Navigator.pop(state.context);
-  //   } catch (e) {
-  //     MyDialog.circularProgressStop(state.context);
-  //     MyDialog.info(
-  //         context: state.context,
-  //         title: 'Save PhotoComment error',
-  //         content: '$e');
-  //   }
-  // }
-
-  // void saveComment(String? value) {
-  //   tempComment.content = value!;
-  // }
-
-  // void addComment(String value, String namevalue) {
-  //   memo = value;
-  //   originalPoster = namevalue;
-
-  //   showDialog(
-  //       context: state.context,
-  //       builder: (BuildContext context) {
-  //         return Scaffold(
-  //           appBar: AppBar(
-  //             title: Text('Create an account'),
-  //           ),
-  //           body: Padding(
-  //             padding: const EdgeInsets.only(
-  //               top: 15.0,
-  //               left: 15.0,
-  //               right: 15.0,
-  //             ),
-  //             child: Form(
-  //               key: formKey,
-  //               child: SingleChildScrollView(
-  //                 child: Column(
-  //                   children: [
-  //                     Text('Create a Comment',
-  //                         style: Theme.of(context).textTheme.headline5),
-  //                     TextFormField(
-  //                       decoration: InputDecoration(
-  //                         hintText: 'Enter Comment',
-  //                       ),
-  //                       keyboardType: TextInputType.emailAddress,
-  //                       autocorrect: false,
-  //                       onSaved: saveComment,
-  //                     ),
-  //                     ElevatedButton(
-  //                       onPressed: createComment,
-  //                       child: Text(
-  //                         'Add',
-  //                         style: Theme.of(context).textTheme.button,
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         );
-  //       });
-  // }
 
   void sharedWith() async {
     try {
@@ -525,7 +339,7 @@ class _Controller {
     }
   }
 
-  void search() async {
+  void search(String? dropdownvalue) async {
     FormState? currentState = state.formKey.currentState;
     if (currentState == null) return;
     currentState.save();
@@ -533,7 +347,7 @@ class _Controller {
     if (searchKeyString != null) {
       var tokens = searchKeyString!.split(RegExp('(,| )+')).toList();
       for (var t in tokens) {
-        if (t.trim().isNotEmpty) keys.add(t.trim().toLowerCase());
+        if (t.trim().isNotEmpty) keys.add(t.trim());
       }
     }
 
@@ -542,14 +356,20 @@ class _Controller {
     try {
       late List<PhotoMemo> results;
       if (keys.isEmpty) {
-        //read all photomemos
         results = await FirestoreController.getPhotoMemoList(
             email: state.widget.email);
       } else {
-        results = await FirestoreController.searchImages(
-          createdBy: state.widget.email,
-          searchLabels: keys,
-        );
+        if (dropdownvalue == 'Image') {
+          results = await FirestoreController.searchImages(
+            createdBy: state.widget.email,
+            searchLabels: keys,
+          );
+        } else if (dropdownvalue == 'Text') {
+          results = await FirestoreController.searchText(
+            createdBy: state.widget.email,
+            textLabels: keys,
+          );
+        }
       }
       MyDialog.circularProgressStop(state.context);
       state.render(() => photoMemoList = results);

@@ -155,6 +155,26 @@ class FirestoreController {
     return results;
   }
 
+  static Future<List<PhotoMemo>> searchText({
+    required String createdBy,
+    required List<String> textLabels, //OR search
+  }) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.PHOTOMEMO_COLLECTION)
+        .where(PhotoMemo.CREATED_BY, isEqualTo: createdBy)
+        .where(PhotoMemo.TEXT_LABELS, arrayContainsAny: textLabels)
+        .orderBy(PhotoMemo.TIMESTAMP, descending: true)
+        .get();
+
+    var results = <PhotoMemo>[];
+    querySnapshot.docs.forEach((doc) {
+      var p = PhotoMemo.fromFirestoreDoc(
+          doc: doc.data() as Map<String, dynamic>, docId: doc.id);
+      if (p != null) results.add(p);
+    });
+    return results;
+  }
+
   static Future<void> deletePhotoMemo({
     required PhotoMemo photoMemo,
   }) async {

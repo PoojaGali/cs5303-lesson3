@@ -87,7 +87,7 @@ class _DetailSharedState extends State<DetailSharedScreen> {
               Text('Created at: ${con.tempMemo.timestamp}'),
               Text('Shared With: ${con.tempMemo.sharedWith}'),
               Text('Image Labels: ${con.tempMemo.imageLabels}'),
-              Text('Text Labels: ${con.tempMemo.readText}'),
+              Text('Text Labels: ${con.tempMemo.textLabels}'),
               SizedBox(
                 height: 5.0,
               ),
