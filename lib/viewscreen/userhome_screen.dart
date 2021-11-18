@@ -41,7 +41,7 @@ class _UserHomeState extends State<UserHomeScreen> {
   List<PhotoMemo> photoMemoList = [];
   List<PhotoComment> photoCommentList = [];
   late User user;
-  int index = 0;
+  // int index = 0;
   String? dropdownValue;
   GlobalKey<FormState> formKey = GlobalKey();
   @override
@@ -158,7 +158,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                 style: Theme.of(context).textTheme.headline6,
               )
             : ListView.builder(
-                itemCount: photoMemoList.length,
+                itemCount: con.photoMemoList.length,
                 itemBuilder: (context, index) {
                   return Container(
                     color: con.delIndexes.contains(index)
@@ -354,7 +354,7 @@ class _Controller {
     MyDialog.circularProgressStart(state.context);
 
     try {
-      late List<PhotoMemo> results;
+      List<PhotoMemo> results = [];
       if (keys.isEmpty) {
         results = await FirestoreController.getPhotoMemoList(
             email: state.widget.email);
