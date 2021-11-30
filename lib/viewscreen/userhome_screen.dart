@@ -132,7 +132,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                   onTap: () => con.viewMyProfile(user)),
               ListTile(
                 leading: Icon(Icons.people),
-                title: Text('Shared with'),
+                title: Text('Shared with me'),
                 onTap: con.sharedWith,
               ),
               ListTile(

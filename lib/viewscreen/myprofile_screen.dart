@@ -97,24 +97,44 @@ class _MyProfileState extends State<MyProfileScreen> {
                     : SizedBox(
                         height: 1.0,
                       ),
-                Text(
-                  'E-mail:',
-                  style: TextStyle(color: Colors.red),
+                Container(
+                  color: Colors.pinkAccent,
+                  child: Row(
+                    children: [
+                      Text(
+                        'E-mail',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Text(
                   '${profile.email}',
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.subtitle1,
                 ),
                 SizedBox(
                   height: 1.0,
                 ),
-                Text(
-                  'Name',
-                  style: TextStyle(color: Colors.red),
+                Container(
+                  color: Colors.pinkAccent,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Name',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 TextFormField(
                   enabled: editMode,
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.subtitle1,
                   decoration: InputDecoration(
                     hintText: 'Enter Name',
                   ),
@@ -125,13 +145,23 @@ class _MyProfileState extends State<MyProfileScreen> {
                 SizedBox(
                   height: 1.0,
                 ),
-                Text(
-                  'Bio',
-                  style: TextStyle(color: Colors.red),
+                Container(
+                  color: Colors.pinkAccent,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Bio',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 TextFormField(
                   enabled: editMode,
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.subtitle1,
                   decoration: InputDecoration(
                     hintText: 'Enter bio',
                   ),
@@ -139,13 +169,23 @@ class _MyProfileState extends State<MyProfileScreen> {
                   autocorrect: true,
                   onSaved: con.saveDescription,
                 ),
-                Text(
-                  'Member Since:',
-                  style: TextStyle(color: Colors.red),
+                Container(
+                  color: Colors.pinkAccent,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Joined On',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Text(
                   '${profile.signUpDate}',
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.subtitle1,
                 ),
                 SizedBox(
                   height: 30.0,

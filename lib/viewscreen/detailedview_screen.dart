@@ -171,9 +171,6 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                   : SizedBox(
                       height: 1.0,
                     ),
-              SizedBox(
-                height: 5.0,
-              ),
               Container(
                 color: Colors.blueAccent,
                 child: Row(
