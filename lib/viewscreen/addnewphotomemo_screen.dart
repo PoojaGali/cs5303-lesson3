@@ -25,6 +25,7 @@ class AddNewPhotoMemoScreen extends StatefulWidget {
 
 class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
   late _Controller con;
+  String? dropdownValue;
 
   GlobalKey<FormState> formkey = GlobalKey();
   File? photo;
@@ -114,6 +115,26 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
                 validator: PhotoMemo.validateSharedWith,
                 onSaved: con.saveSharedWith,
               ),
+              DropdownButton<String>(
+                value: dropdownValue,
+                hint: Text('ML'),
+                icon: const Icon(Icons.arrow_drop_down),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+                items: <String>[
+                  'Image',
+                  'Text',
+                  'Both',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
             ],
           ),
         ),
@@ -157,12 +178,24 @@ class _Controller {
         },
       );
       //get image labels by ML
-      List<String> recognitions =
-          await GoogleMLController.getImageLabels(photo: state.photo!);
-      tempMemo.imageLabels.addAll(recognitions);
-      List<String> textrecognitions =
-          await GoogleMLController.readText(photo: state.photo!);
-      tempMemo.textLabels.addAll(textrecognitions);
+      if (state.dropdownValue == 'Image') {
+        List<String> recognitions =
+            await GoogleMLController.getImageLabels(photo: state.photo!);
+        tempMemo.imageLabels.addAll(recognitions);
+      }
+      if (state.dropdownValue == 'Text') {
+        List<String> textrecognitions =
+            await GoogleMLController.readText(photo: state.photo!);
+        tempMemo.textLabels.addAll(textrecognitions);
+      }
+      if (state.dropdownValue == 'Both') {
+        List<String> textrecognitions =
+            await GoogleMLController.readText(photo: state.photo!);
+        tempMemo.textLabels.addAll(textrecognitions);
+        List<String> recognitions =
+            await GoogleMLController.getImageLabels(photo: state.photo!);
+        tempMemo.imageLabels.addAll(recognitions);
+      }
       tempMemo.photoFilename = photoInfo[ARGS.Filename];
       tempMemo.photoURL = photoInfo[ARGS.DownloadURL];
       tempMemo.createdBy = state.widget.user.email!;
