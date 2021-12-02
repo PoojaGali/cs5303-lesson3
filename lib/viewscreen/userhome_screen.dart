@@ -359,17 +359,10 @@ class _Controller {
         results = await FirestoreController.getPhotoMemoList(
             email: state.widget.email);
       } else {
-        if (dropdownvalue == 'Image') {
-          results = await FirestoreController.searchImages(
-            createdBy: state.widget.email,
-            searchLabels: keys,
-          );
-        } else if (dropdownvalue == 'Text') {
-          results = await FirestoreController.searchText(
-            createdBy: state.widget.email,
-            textLabels: keys,
-          );
-        }
+        results = await FirestoreController.searchImages(
+          createdBy: state.widget.email,
+          searchLabels: keys,
+        );
       }
       MyDialog.circularProgressStop(state.context);
       state.render(() => photoMemoList = results);

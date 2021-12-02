@@ -142,7 +142,7 @@ class FirestoreController {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection(Constant.PHOTOMEMO_COLLECTION)
         .where(PhotoMemo.CREATED_BY, isEqualTo: createdBy)
-        .where(PhotoMemo.IMAGE_LABELS, arrayContainsAny: searchLabels)
+        .where(PhotoMemo.OUTPUT_LABELS, arrayContainsAny: searchLabels)
         .orderBy(PhotoMemo.TIMESTAMP, descending: true)
         .get();
 
