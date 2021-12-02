@@ -46,6 +46,7 @@ class _DetailedViewState extends State<DetailedViewScreen> {
 
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String? progressMessage;
+  String? dropdownValue;
 
   @override
   void initState() {
@@ -161,13 +162,28 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                 validator: PhotoMemo.validateSharedWith,
                 onSaved: con.saveSharedWith,
               ),
+              DropdownButton<String>(
+                value: dropdownValue,
+                hint: Text('ML'),
+                icon: const Icon(Icons.arrow_drop_down),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    dropdownValue = newValue!;
+                  });
+                },
+                items: <String>[
+                  'Image',
+                  'Text',
+                  'Both',
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
               Constant.DEV
-                  ? Text('Image Labels by ML\n${con.tempMemo.imageLabels}')
-                  : SizedBox(
-                      height: 1.0,
-                    ),
-              Constant.DEV
-                  ? Text('Text Labels by ML\n${con.tempMemo.textLabels}')
+                  ? Text('Image Labels by ML\n${con.tempMemo.outputlabels}')
                   : SizedBox(
                       height: 1.0,
                     ),
@@ -341,12 +357,32 @@ class _Controller {
           },
         );
         //generate image lables by Ml
-        List<String> recognitions =
-            await GoogleMLController.getImageLabels(photo: photo!);
-        tempMemo.imageLabels = recognitions;
+        if (state.dropdownValue == 'Image') {
+          List<String> recognitions =
+              await GoogleMLController.getImageLabels(photo: photo!);
+          tempMemo.imageLabels = recognitions;
+          tempMemo.outputlabels = tempMemo.imageLabels;
+          updateInfo[PhotoMemo.IMAGE_LABELS] = tempMemo.imageLabels;
+        }
+        if (state.dropdownValue == 'Text') {
+          List<String> recognitions =
+              await GoogleMLController.readText(photo: photo!);
+          tempMemo.textLabels = recognitions;
+          tempMemo.outputlabels = tempMemo.textLabels;
+          updateInfo[PhotoMemo.TEXT_LABELS] = tempMemo.textLabels;
+        }
         tempMemo.photoURL = photoInfo[ARGS.DownloadURL];
         updateInfo[PhotoMemo.PHOTO_URL] = tempMemo.photoURL;
-        updateInfo[PhotoMemo.IMAGE_LABELS] = tempMemo.imageLabels;
+        // updateInfo[PhotoMemo.IMAGE_LABELS] = tempMemo.imageLabels;
+      }
+      if (photo == null) {
+        if (state.dropdownValue == 'Image') {
+          tempMemo.outputlabels = state.widget.photoMemo.imageLabels;
+        }
+        if (state.dropdownValue == 'Text') {
+          tempMemo.outputlabels = state.widget.photoMemo.textLabels;
+        }
+        updateInfo[PhotoMemo.OUTPUT_LABELS] = tempMemo.outputlabels;
       }
       //update Firestore doc
       if (tempMemo.title != state.widget.photoMemo.title)

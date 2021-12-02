@@ -87,25 +87,25 @@ class _UserHomeState extends State<UserHomeScreen> {
                     icon: Icon(Icons.cancel),
                     onPressed: con.cancelDelete,
                   ),
-            DropdownButton<String>(
-              value: dropdownValue,
-              hint: Text('ML'),
-              icon: const Icon(Icons.arrow_drop_down),
-              onChanged: (String? newValue) {
-                setState(() {
-                  dropdownValue = newValue!;
-                });
-              },
-              items: <String>[
-                'Image',
-                'Text',
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
+            // DropdownButton<String>(
+            //   value: dropdownValue,
+            //   hint: Text('ML'),
+            //   icon: const Icon(Icons.arrow_drop_down),
+            //   onChanged: (String? newValue) {
+            //     setState(() {
+            //       dropdownValue = newValue!;
+            //     });
+            //   },
+            //   items: <String>[
+            //     'Image',
+            //     'Text',
+            //   ].map<DropdownMenuItem<String>>((String value) {
+            //     return DropdownMenuItem<String>(
+            //       value: value,
+            //       child: Text(value),
+            //     );
+            //   }).toList(),
+            // ),
             con.delIndexes.isEmpty
                 ? IconButton(
                     onPressed: () => con.search(dropdownValue),

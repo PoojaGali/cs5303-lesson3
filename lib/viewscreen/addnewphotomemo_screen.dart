@@ -182,19 +182,27 @@ class _Controller {
         List<String> recognitions =
             await GoogleMLController.getImageLabels(photo: state.photo!);
         tempMemo.imageLabels.addAll(recognitions);
+        tempMemo.outputlabels = tempMemo.imageLabels;
+        List<String> textrecognitions =
+            await GoogleMLController.readText(photo: state.photo!);
+        tempMemo.textLabels.addAll(textrecognitions);
       }
       if (state.dropdownValue == 'Text') {
         List<String> textrecognitions =
             await GoogleMLController.readText(photo: state.photo!);
         tempMemo.textLabels.addAll(textrecognitions);
+        tempMemo.outputlabels = tempMemo.textLabels;
+        List<String> recognitions =
+            await GoogleMLController.getImageLabels(photo: state.photo!);
+        tempMemo.imageLabels.addAll(recognitions);
       }
       if (state.dropdownValue == 'Both') {
         List<String> textrecognitions =
             await GoogleMLController.readText(photo: state.photo!);
-        tempMemo.textLabels.addAll(textrecognitions);
+        tempMemo.outputlabels.addAll(textrecognitions);
         List<String> recognitions =
             await GoogleMLController.getImageLabels(photo: state.photo!);
-        tempMemo.imageLabels.addAll(recognitions);
+        tempMemo.outputlabels.addAll(recognitions);
       }
       tempMemo.photoFilename = photoInfo[ARGS.Filename];
       tempMemo.photoURL = photoInfo[ARGS.DownloadURL];
